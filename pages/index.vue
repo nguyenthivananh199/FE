@@ -1,11 +1,6 @@
 <template>
   <v-container>
     <h1>Upload file and open</h1>
-    <v-text-field v-model="name" placeholder="name..."></v-text-field>
-    <v-text-field
-      v-model="description"
-      placeholder="description..."
-    ></v-text-field>
     <input
       type="file"
       class="custom-file-input"
@@ -16,6 +11,7 @@
     <v-btn @click="uploadFile()">submit</v-btn>
     <v-btn @click="downloadFile()">download</v-btn>
     <!-- <img src="./home/vananh/Desktop/tmp.png"> -->
+    
   </v-container>
 </template>
 

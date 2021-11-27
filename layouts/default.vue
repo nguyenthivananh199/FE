@@ -122,6 +122,16 @@ export default {
           title: ' quizz update',
           to: '/updateQuizz',
         },
+        {
+          icon: 'mdi-plus-minus',
+          title: ' chat',
+          to: '/chat',
+        },
+        {
+          icon: 'mdi-plus-minus',
+          title: ' courses',
+          to: '/courses',
+        },
       ],
       title: 'Smart Kiddy Quizzes',
       langEn: true,
