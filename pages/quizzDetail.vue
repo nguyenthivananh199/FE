@@ -104,9 +104,10 @@ export default {
       } else {
         if (this.countDown === 0) {
           this.calculation();
+          if(this.submited===false){
           swal.fire("Test!", "Hello test message", "success");
           this.submited=true;
-          this.submitQuizz()
+          this.submitQuizz()}
         }
       }
     },
