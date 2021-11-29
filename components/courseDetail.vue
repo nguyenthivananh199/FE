@@ -1,6 +1,16 @@
 <template>
   <div>
-    <h1>This is a test page for admin</h1>
+    <v-btn
+      class="ma-2"
+      text
+      icon
+      color="blue lighten-2"
+      @click="$router.go(-1)"
+    >
+      <v-icon>mdi-thumb-up</v-icon>
+    </v-btn>
+
+    <!-- <h1>This is a test page for admin</h1> -->
     <v-container>
       <v-row>
         <v-col class="text-center">

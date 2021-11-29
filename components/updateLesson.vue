@@ -10,7 +10,7 @@
       <v-icon>mdi-thumb-up</v-icon>
     </v-btn>
 
-    <h1>This is a test page for admin</h1>
+    <!-- <h1>This is a test page for admin</h1> -->
     <v-container>
       <v-row>
         <v-col class="text-center">
@@ -18,18 +18,18 @@
             <v-card-title primary-title> Update Lesson</v-card-title>
             <!-- <a   ></a> -->
 
-            <video id="video-preview" width="800" controls />
-            <!-- <video v-else width="800" controls>
+            <video v-if="check===true" id="video-preview" width="800" controls ></video>
+            <video v-if="check===false" width="800" controls>
               <source
                 :src="'http://127.0.0.1:8000/api/document/lessons/'+lessonId"
                 type="video/mp4"
               />
               Your browser does not support HTML video.
-            </video> -->
+            </video>
             <!-- <input type="file" accept="video/*" @change="handleFileUpload( $event )"/> -->
             <p>{{ this.file.name }}</p>
             <!-- <p v-else>fresrfgr</p> -->
-            <label for="upload-photo">Choose New Video From Browse...</label>
+            <label for="upload-photo" @click="tesst()">Choose New Video From Browse...</label>
             <input
               type="file"
               accept="video/*"
@@ -99,7 +99,8 @@ export default {
   },
   data() {
     return {
-      c: "1",
+      check:false,
+      newVideo:false,
       videoLink: "",
       file: "",
       name: "",
@@ -108,6 +109,9 @@ export default {
     };
   },
   methods: {
+    tesst(){
+this.check=true;
+    },
     handleFileUpload(event) {
       this.file = event.target.files[0];
       // console.log('file 0 ne')

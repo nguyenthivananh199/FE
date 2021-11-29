@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>This is a test page for admin</h1>
+    <!-- <h1>This is a test page for admin</h1> -->
     <v-container>
       <v-row>
         <v-col class="text-center">

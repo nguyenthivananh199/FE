@@ -1,102 +1,181 @@
 <template>
-  <v-container>
-    <h1>Upload file and open</h1>
-    <input
-      type="file"
-      class="custom-file-input"
-      id="customFile"
-      ref="file"
-      @change="handleFileObject()"
-    />
-    <v-btn @click="uploadFile()">submit</v-btn>
-    <v-btn @click="downloadFile()">download</v-btn>
-    <!-- <img src="./home/vananh/Desktop/tmp.png"> -->
-    
-  </v-container>
+    <v-row justify="center" align="center" class="fill-height" no-gutters>
+        <v-col cols="12" sm="6">
+            <v-card align="center">
+                <v-card-title class="text-center mb-10">
+                    {{ mode === 'signin' ? 'auth.login-title' : 'auth.register' }}
+                    <!-- {{ JSON.stringify(user)}} -->
+                </v-card-title>
+                <v-card-text>
+                    <v-form ref="form" v-model="valid">
+                        <v-text-field v-if="mode !== 'signin'"
+                            v-model="name"
+                            name="name"
+                            label="user"
+                            hint="$t('auth.username-hint')"
+                            prepend-inner-icon="mdi-user"
+                            :rules="emailRules"
+                            outlined
+                        ></v-text-field>
+                        <v-text-field
+                            v-model="email"
+                            name="email"
+                            label="$t('auth.login-email')"
+                            hint="$t('auth.login-email-hint')"
+                            prepend-inner-icon="mdi-credit-card"
+                            :rules="emailRules"
+                            outlined
+                        ></v-text-field>
+                        <v-text-field
+                            v-model="password"
+                            name="password"
+                            label="$t('auth.login-password')"
+                            outlined
+                            prepend-inner-icon="mdi-key"
+                            :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+                            :type="showPassword ? 'text' : 'password'"
+                            :rules="passwordRules"
+                            @click:append="showPassword = !showPassword"
+                        ></v-text-field>
+                        <v-text-field v-if="mode !== 'signin'"
+                            v-model="rePassword"
+                            name="rePassword"
+                            label="$t('auth.register-confirm-password')"
+                            outlined
+                            prepend-inner-icon="mdi-key"
+                            type="password"
+                            :rules="[...passwordRules, (password === rePassword) || 'Password must match']"                        
+                        ></v-text-field>
+                    </v-form>
+                </v-card-text>
+                <v-card-actions class="row">
+                    <v-btn v-if="mode === 'signin'" color="success" class="px-10 ml-6 col-5" @click="login()">
+                        Login
+                    </v-btn>
+                    <v-btn v-else color="accent" class="px-10 ml-6 col-5" @click="mode = 'signin'">
+                        <v-icon left dark>mdi-undo-variant</v-icon>login
+                    </v-btn>
+                    <v-spacer />
+                    <v-btn color="primary" class="px-10 mr-6 col-5" @click="register()">
+                       Register
+                    </v-btn>
+                    <nuxt-link to="" class="col col-12 block">
+                       forgot
+                    </nuxt-link>
+                </v-card-actions>
+            </v-card>
+        </v-col>
+    </v-row>
 </template>
-
 <script>
-import axios from "axios";
-export default {
-  data() {
-    return {
-      name: "",
-      file: null,
-      description: "",
-      courseId: 1,
-      list: [],
-    };
-  },
-  mounted() {
-    this.getListUser();
-    this.$echo.channel("chat1").listen("PostCreated", (e) => {
-      console.log(e);
-    });
-  },
-  computed: {
-    // show/hide dialog
-    config() {
-      const token = localStorage.getItem("jwt");
-      return {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type":
-            "multipart/form-data; charset=utf-8; boundary=" +
-            Math.random().toString().substr(2),
-        },
-      };
-    },
-  },
-  methods: {
-    handleFileObject() {
-      this.file = this.$refs.file.files[0];
-      console.log(this.file);
-    },
-    async uploadFile() {
-      const fd = new FormData();
-      fd.append("file", this.file, this.file.name);
-      fd.append("name",this.name);
-      await axios
-        .post("http://127.0.0.1:8000/api/document/create", fd, this.config)
-        .then((rs) => {
-          console.log(rs);
-        });
-    },
-    async getListUser() {
-      await axios
-        .get("http://127.0.0.1:8000/api/users", this.config)
-        .then((result) => {
-          this.list = result;
-        });
-    },
-    async downloadFile() {
-      await axios
-        .get("http://127.0.0.1:8000/api/document/download", {
-          responseType: "arraybuffer",
-        })
-        //     .then((response) => {
-        //       let blob = new Blob([response.data],
-        // //       {
-        // //    document" type: "application/vnd.openxmlformats-officedocument.wordprocessingml.
-        // // }
-        // )
-        //   let link = document.createElement('a')
-        //   link.href = window.URL.createObjectURL(blob)
-        //   link.download = 'demo.docx'
-        //   link.click()
-        //     });
-        .then((response) => {
-          const url = window.URL.createObjectURL(new Blob([response.data]));
-          const link = document.createElement("a");
-          link.href = url;
-          link.setAttribute("download", "pp.pptx");
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-        });
-    },
-  },
-};
-</script>
+import swal from "sweetalert2";
+import {mapGetters, mapState, mapActions } from 'vuex'
 
-<style></style>
+export default {
+    name: 'Index',
+    layout: 'auth',
+    data: () => ({
+        mode: 'signin',
+        valid: false,
+        name: '',
+        email: '',
+        password: '',
+        rePassword: '',
+        showPassword: false,
+        emailRules: [
+            (value) => !!value || 'Email is required.',
+        ],
+        passwordRules: [
+            (value) => !!value || 'Password is required.',
+            (value) => (value || '').length >= 8 || 'Minimum 8 characters',
+        ],
+    }),
+
+    computed: {
+        ...mapGetters('auth', ['isAuthenticated']),
+        ...mapState('auth', ['user']),
+    },
+
+    async beforeMount() {
+        if (localStorage) {
+            const token = localStorage.getItem("jwt")
+            if(token) {
+                if(!this.user) {
+                    await this.getUserData({data: null, token: localStorage.getItem('jwt')});
+                }
+                this.loggedIn()
+            }
+        }
+    },
+
+    methods: {
+        ...mapActions('auth', ['getUserData']),
+
+        loggedIn() {
+            this.$router.push('/home');
+        },
+
+        async login() {
+            this.$refs.form.validate()
+            if (!this.valid) return;
+
+            // call api to login
+            try {
+                const response = await this.$axios.post("user/login", {
+                    email: this.email,
+                    password: this.password,
+                });
+                console.log(response);
+                const token = response.data.token;
+                const user = response.data.user;
+                localStorage.setItem("jwt", token);
+                if (token) {
+                    await this.getUserData({user, token});
+                    swal.fire("Success", "Login Successful", "success");
+                    this.loggedIn();
+                }
+            } catch (err) {
+                swal.fire("Error", "Something Went Wrong", "error");
+                console.log(err);
+            }
+        },
+        async register() {
+            // check auth mode first
+            if (this.mode === 'signin') {
+                this.mode = 'signup';
+            } else {
+                this.$refs.form.validate()
+                if (!this.valid) return;
+
+                // call api to register
+                try {
+                    const response = await this.$axios.post("user/register", {
+                        email: this.email,
+                        name: this.name,
+                        password: this.password,
+                    });
+                    console.log(response);
+                    const token = response.data.token;
+                    const user = response.data.user;
+                    if (token) {
+                        localStorage.setItem("jwt", token);
+                        await this.getUserData({user, token});
+                        swal.fire("Success", "Registration Was successful", "success");
+                        this.loggedIn();
+                    } else {
+                    swal.fire("Error", "Something Went Wrong", "Error");
+                    }
+                } catch (err) {
+                    console.log({err})
+                    const error = err.response;
+                    if (error.status === 409) {
+                    swal.fire("Error", error.data.message, "error");
+                    } else {
+                    swal.fire("Error", error.data.err.message, "error");
+                    }
+                }
+            }
+        }
+    },
+}
+</script>

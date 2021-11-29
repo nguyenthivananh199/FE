@@ -68,7 +68,7 @@ export default {
   data() {
     return {
       test: [],
-      countDown: 10,
+      countDown: 0,
       m: "",
       s: "",
       userAns:[],
